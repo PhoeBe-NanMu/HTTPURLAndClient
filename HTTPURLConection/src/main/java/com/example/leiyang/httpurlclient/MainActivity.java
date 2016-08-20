@@ -26,12 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler() {
         public void handleMessage(Message message) {
             super.handleMessage(message);
-            switch(message.what) {
+            switch (message.what) {
                 case SHOW_INFORMATION:
                     String response = (String) message.obj;
                     showInformationTextView.setText(response);
                     break;
-                default:break;
+                default:
+                    break;
             }
         }
     };
@@ -65,11 +66,11 @@ public class MainActivity extends AppCompatActivity {
                     InputStreamReader inReader = new InputStreamReader(in);
                     BufferedReader bufferReader = new BufferedReader(inReader);
                     StringBuilder response = new StringBuilder();
-                    String line ;
-                    while((line = bufferReader.readLine()) != null) {
+                    String line;
+                    while ((line = bufferReader.readLine()) != null) {
                         response.append(line);
                     }
-                    Log.i("info",response.toString());
+                    Log.i("info", response.toString());
                     Message message = new Message();
                     message.what = SHOW_INFORMATION;
                     message.obj = response.toString();
@@ -79,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
-                    Log.i("info","--------error");
+                    Log.i("info", "--------error");
                     e.printStackTrace();
                 } finally {
-                    if (httpurlconnection !=null) {
+                    if (httpurlconnection != null) {
                         httpurlconnection.disconnect();
                     }
                 }
