@@ -9,10 +9,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 HttpURLConnection httpurlconnection = null;
                 try {
-                    URL url = new URL("http://www.baidu.com");
+                    URL url = new URL("http://10.0.2.2/test2.xml");
                     httpurlconnection = (HttpURLConnection) url.openConnection();
                     httpurlconnection.setRequestMethod("GET");
                     httpurlconnection.setConnectTimeout(8000);
@@ -70,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
                     while ((line = bufferReader.readLine()) != null) {
                         response.append(line);
                     }
+
+                    parseXMLWithPULL(response.toString());
+
                     Log.i("info", response.toString());
                     Message message = new Message();
                     message.what = SHOW_INFORMATION;
@@ -89,5 +97,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
+    }
+
+    private void parseXMLWithPULL(String response) {
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xmlPullParser = factory.newPullParser();
+            xmlPullParser.setInput(new StringReader(response));
+            int eventType = xmlPullParser.getEventType();
+            String id = "";
+            String name = "";
+            String version = "";
+            while(eventType != XmlPullParser.END_DOCUMENT) {
+                String nodeName = xmlPullParser.getName();
+                switch(eventType) {
+                    //开始解析某个节点
+                    case XmlPullParser.START_TAG:
+                        if ("id".equals(nodeName)) {
+                            id = xmlPullParser.nextText();
+
+                        }
+                }
+            }
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
