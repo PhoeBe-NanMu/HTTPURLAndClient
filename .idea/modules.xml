@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HTTPURLAndClient.iml" filepath="$PROJECT_DIR$/HTTPURLAndClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/HTTPURLConection/HTTPURLConection.iml" filepath="$PROJECT_DIR$/HTTPURLConection/HTTPURLConection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/httputil/httputil.iml" filepath="$PROJECT_DIR$/httputil/httputil.iml" />
     </modules>
   </component>
 </project>

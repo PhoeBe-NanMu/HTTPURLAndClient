@@ -61,8 +61,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 HttpURLConnection httpurlconnection = null;
+
                 try {
+//                    URL url = new URL("http://news.baidu.com/news.xml");
+//                    URL url = new URL("http://trade.500wan.com/static/public/ssc/xml/newlyopenlist.xml");
+//                    URL url = new URL("file:///D:/WorkSpace/AndroidStudioProjects/HTTPURLAndClient/test2.xml");
+
                     URL url = new URL("http://10.0.2.2/test2.xml");
+//                    URL url = new URL("file:storage/emulated/0/test2.xml");
+
                     httpurlconnection = (HttpURLConnection) url.openConnection();
                     httpurlconnection.setRequestMethod("GET");
                     httpurlconnection.setConnectTimeout(8000);
@@ -86,9 +93,11 @@ public class MainActivity extends AppCompatActivity {
                     handler.sendMessage(message);
 
                 } catch (MalformedURLException e) {
+                    Log.i("info", "--------error1");
+
                     e.printStackTrace();
                 } catch (IOException e) {
-                    Log.i("info", "--------error");
+                    Log.i("info", "--------error2");
                     e.printStackTrace();
                 } finally {
                     if (httpurlconnection != null) {
@@ -115,9 +124,22 @@ public class MainActivity extends AppCompatActivity {
                     case XmlPullParser.START_TAG:
                         if ("id".equals(nodeName)) {
                             id = xmlPullParser.nextText();
-
+                        } else if ("name".equals(nodeName)) {
+                            name = xmlPullParser.nextText();
+                        } else if ("version".equals(nodeName)) {
+                            version = xmlPullParser.nextText();
                         }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        if ("app".equals(nodeName)) {
+                            Log.i("info","id is "+id);
+                            Log.i("info","name is "+name);
+                            Log.i("info","version is "+version);
+                        }
+                        break;
+                    default:break;
                 }
+                eventType = xmlPullParser.next();
             }
         } catch (XmlPullParserException e) {
             e.printStackTrace();

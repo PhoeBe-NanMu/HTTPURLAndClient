@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">HttpUtil</string>
+    <string name="getInformation">获取信息</string>
+    <string name="baidu">百度首页</string>
+</resources>
