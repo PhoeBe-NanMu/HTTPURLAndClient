@@ -1,5 +1,6 @@
 package com.example.httputil;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.net.URLEncoder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,8 +44,12 @@ private Handler handler = new Handler() {
 
             @Override
             public void onClick(View view) {
-                String address = "http://www.baidu.com";
-                HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
+
+//                String address = "http://www.baidu.com";
+                String address = "http://trade.500.com/static/public/ssc/xml/newlyopenlist.xml";
+//                String address = "http://111.8.49.214:8080/";
+                Log.i("info",address.toString());
+                HttpUtil.sendHttpRequest(address.toString(), new HttpCallbackListener() {
                     @Override
                     public void onFinish(final String s) {
                         Log.i("info",s);

@@ -2,10 +2,15 @@ package com.example.httputil;
 
 import android.util.Log;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,21 +27,32 @@ public class HttpUtil {
                 HttpURLConnection httpURLConnection = null;
                 try {
                     URL url = new URL(address);
+                    Log.i("info",url.toString());
                     httpURLConnection = (HttpURLConnection) url.openConnection();
                     httpURLConnection.setRequestMethod("GET");
 
                     /*时间太短可能无法从服务器获取信息*/
-                    httpURLConnection.setReadTimeout(8000);
-                    httpURLConnection.setConnectTimeout(8000);
+                    httpURLConnection.setReadTimeout(10*1000);
+                    httpURLConnection.setConnectTimeout(10*1000);
                     httpURLConnection.setDoInput(true);
-                    httpURLConnection.setDoOutput(true);
+
+                    /*不可以设置setDoInput为true，因为目标xml文件不可写
+                    * 如果设置-- httpURLConnection.setDoInput(true) --会导致 -- httpURLConnection.getInputStream()出错 无法获取InputStream--*/
+//                    httpURLConnection.setDoOutput(true);
                     StringBuilder stringBuilder = new StringBuilder();
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                    String stringLine;
-                    while((stringLine = bufferedReader.readLine())!=null) {
-                        stringBuilder.append(stringLine);
+                    if (httpURLConnection.getResponseCode() == 200) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream,"UTF-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        String stringLine;
+                        while((stringLine = bufferedReader.readLine())!=null) {
+                            stringBuilder.append(stringLine);
+                        }
+
+                        parseXMLWithPULL(stringBuilder.toString());
+
+                    } else {
+                        Log.i("info","cannot getInputStream");
                     }
                     Log.i("info",stringBuilder.toString());
                     if (httpCallbackListener!=null) {
@@ -57,5 +73,46 @@ public class HttpUtil {
             }
         }).start();
 
+    }
+    private static void parseXMLWithPULL(String response) {
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xmlPullParser = factory.newPullParser();
+            xmlPullParser.setInput(new StringReader(response));
+            int eventType = xmlPullParser.getEventType();
+            String id = "";
+            String name = "";
+            String version = "";
+            while(eventType != XmlPullParser.END_DOCUMENT) {
+                String nodeName = xmlPullParser.getName();
+                switch(eventType) {
+                    //开始解析某个节点
+                    case XmlPullParser.START_TAG:
+                        if ("row".equals(nodeName)) {
+                            id = xmlPullParser.nextText();
+                        } else if ("xml".equals(nodeName)) {
+                            name = xmlPullParser.nextText();
+                        } else if ("version".equals(nodeName)) {
+                            version = xmlPullParser.nextText();
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        if ("app".equals(nodeName)) {
+                            Log.i("info","id is "+id);
+                            Log.i("info","name is "+name);
+                            Log.i("info","version is "+version);
+                        }
+                        break;
+                    default:break;
+                }
+                eventType = xmlPullParser.next();
+            }
+        } catch (XmlPullParserException e) {
+            Log.i("info","XmlPullParserException");
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.i("info","IOException");
+            e.printStackTrace();
+        }
     }
 }
