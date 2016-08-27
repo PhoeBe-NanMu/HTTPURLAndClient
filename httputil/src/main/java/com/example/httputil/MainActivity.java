@@ -1,7 +1,9 @@
 package com.example.httputil;
 
+import android.app.Application;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.URLEncoder;
 
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView showInformationTextView;
 
     /*新建Handler对象handler，重写handMessage(message)方法，对sendMessage(message)传递的参数进行处理*/
+
 private Handler handler = new Handler() {
     public void handleMessage(Message message) {
         super.handleMessage(message);
@@ -34,6 +38,7 @@ private Handler handler = new Handler() {
     }
 };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +50,11 @@ private Handler handler = new Handler() {
             @Override
             public void onClick(View view) {
 
-//                String address = "http://www.baidu.com";
-                String address = "http://trade.500.com/static/public/ssc/xml/newlyopenlist.xml";
+                String address = "http://www.baidu.com";
+//                String address = "http://trade.500.com/static/public/ssc/xml/newlyopenlist.xml";
 //                String address = "http://111.8.49.214:8080/";
                 Log.i("info",address.toString());
+
                 HttpUtil.sendHttpRequest(address.toString(), new HttpCallbackListener() {
                     @Override
                     public void onFinish(final String s) {
@@ -67,7 +73,13 @@ private Handler handler = new Handler() {
 
                                 /*一定要注意是sendMessage(),而不是handMessage()*/
                                 handler.sendMessage(message);
+
+                                /*非主线程中无法使用Toast，Looper.prepare();Looper.loop();将Toast包裹起来*/
+                                Looper.prepare();
+                                Toast.makeText(MainActivity.this, "非主线程中无法使用Toast", Toast.LENGTH_SHORT).show();
+                                Looper.loop();
                                 Log.i("info","---->onFinish()");
+
                             }
                         }).start();
 

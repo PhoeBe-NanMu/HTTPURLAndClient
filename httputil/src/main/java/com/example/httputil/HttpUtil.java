@@ -1,6 +1,8 @@
 package com.example.httputil;
 
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -20,7 +22,12 @@ import java.net.URL;
  */
 
 public class HttpUtil {
+
     public static void sendHttpRequest(final String address, final HttpCallbackListener httpCallbackListener) {
+
+        /*非主线程中无法使用Toast，Looper.prepare();Looper.loop();将Toast包裹起来*/
+        Toast.makeText(MyApplication.getContext(), "This is MyApplication.getContext() --> Context", Toast.LENGTH_SHORT).show();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -31,6 +38,7 @@ public class HttpUtil {
                     httpURLConnection = (HttpURLConnection) url.openConnection();
                     httpURLConnection.setRequestMethod("GET");
 
+//                    Log.i("info","------------------" + MyApplication.getContext());
                     /*时间太短可能无法从服务器获取信息*/
                     httpURLConnection.setReadTimeout(10*1000);
                     httpURLConnection.setConnectTimeout(10*1000);
@@ -54,6 +62,11 @@ public class HttpUtil {
                     } else {
                         Log.i("info","cannot getInputStream");
                     }
+                    
+                    /*测试全局获取Context*/
+//                    Looper.prepare();
+//                    Toast.makeText(MyApplication.getContext(), "This is MyApplication.getContext() --> Context", Toast.LENGTH_SHORT).show();
+//                    Looper.loop();
                     Log.i("info",stringBuilder.toString());
                     if (httpCallbackListener!=null) {
                         httpCallbackListener.onFinish(stringBuilder.toString());
